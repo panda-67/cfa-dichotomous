@@ -20,10 +20,12 @@ if (VERBOSE) cat(">> RUN MODE:", RUN_MODE, "\n")
 result <- cfa_engine(
   file_path       = DATA_FILE,
   pattern         = RUN_MODE,
-  efa             = ENABLE_EFA,
+  efa             = USE_EFA,
   thresh          = EFA_THRESHOLD,
   use_model_file  = USE_MODEL_FILE,
   model_file_path = MODEL_FILE_PATH
 )
 
 if (VERBOSE) cat(">> Finished.\n")
+
+# End of file ===============================================

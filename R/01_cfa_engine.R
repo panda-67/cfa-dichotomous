@@ -32,7 +32,6 @@ generate_efa_model <- function(items, thresh = .30, nfactors = 4) {
   items_num <- as.data.frame(lapply(items, function(x) as.numeric(as.character(x))))
 
   efa <- psych::fa(items_num, nfactors = nfactors, fm = "minres")
-  cat("here")
 
   lines <- c()
   for (f in 1:nfactors) {
@@ -88,7 +87,47 @@ load_dataset <- function(file_path, pattern = "PRETEST") {
 }
 
 # ------------------------------------------------------------
-# 5) RUN CFA + EXPORT EVERYTHING
+# 5) LOAD MODEL
+# ------------------------------------------------------------
+
+load_or_generate_model <- function(items,
+                                   efa        = TRUE,
+                                   thresh     = 0.30,
+                                   file       = NULL,
+                                   use_file   = FALSE) {
+
+  # ------------------------------------------------------------
+  # 1) PRIORITY: load user-specified model file
+  # ------------------------------------------------------------
+  if (use_file) {
+    if (is.null(file)) {
+      stop("use_file = TRUE but no model file path provided.")
+    }
+
+    if (file.exists(file)) {
+      cat(">> Loading model from file:", file, "\n")
+      return(paste(readLines(file), collapse = "\n"))
+    } else {
+      cat("!! Model file not found. Falling back to auto-generation...\n")
+    }
+  }
+
+  # ------------------------------------------------------------
+  # 2) IF NOT USING FILE, DECIDE BETWEEN EFA VS MANUAL
+  # ------------------------------------------------------------
+  if (efa) {
+    cat(">> Generating model via EFA (threshold =", thresh, ")...\n")
+  } else {
+    cat(">> Generating MANUAL model...\n")
+  }
+
+  return(generate_initial_model(items,
+                                efa_override = efa,
+                                thresh       = thresh))
+}
+
+# ------------------------------------------------------------
+# 6) RUN CFA + EXPORT EVERYTHING
 # ------------------------------------------------------------
 
 run_cfa <- function(items, model, label = "cfa_output") {
@@ -145,7 +184,7 @@ run_cfa <- function(items, model, label = "cfa_output") {
 }
 
 # ------------------------------------------------------------
-# 6) MASTER ENGINE — DRIVEN BY setup.R
+# 7) MASTER ENGINE — DRIVEN BY setup.R
 # ------------------------------------------------------------
 
 cfa_engine <- function(file_path, pattern = "PRETEST",
@@ -155,14 +194,14 @@ cfa_engine <- function(file_path, pattern = "PRETEST",
   items <- load_dataset(file_path, pattern)
 
   cat(">> Building model...\n")
-  if (use_model_file && file.exists(model_file_path)) {
-    cat(">> Using model from file:", model_file_path, "\n")
-    model <- readLines(model_file_path)
-    model <- paste(model, collapse = "\n")
-  } else {
-    cat(">> Generating model from EFA...\n")
-    model <- generate_initial_model(items, efa_override = efa, thresh = thresh)
-  }
+  model <- load_or_generate_model(
+    items,
+    efa,
+    thresh,
+    file = model_file_path,
+    use_file = use_model_file
+  )
+
   cat(">> Running CFA...\n")
   fit <- run_cfa(items, model, label = paste0("cfa_", pattern))
 
