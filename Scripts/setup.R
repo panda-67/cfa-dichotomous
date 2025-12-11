@@ -21,7 +21,7 @@ DATA_FILE <- "~/Documents/Daily/Kelas Analisis/ANALISIS PRETEST POST TEST.xlsx"
 # Accepted values:
 #   "PRETEST"
 #   "POST TEST"
-RUN_MODE <- "POST TEST"
+RUN_MODE <- "PRETEST"
 
 
 
@@ -58,7 +58,7 @@ USE_MANUAL_MODEL <- TRUE   # TRUE = fallback manual grouping allowed, will alway
 # EFA_THRESHOLD = minimum absolute loading to keep an item.
 # Typical values: 0.25–0.40
 EFA_THRESHOLD <- 0.30
-
+EFA_FACTOR <- 4
 
 
 # ------------------------------------------------------------
