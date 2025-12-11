@@ -1,0 +1,209 @@
+---
+title: "Laporan Data Pretest"
+email: "info@notivra.com"
+author: "Notivra (www.notivra.com)"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+
+lang: "en"
+output:
+  html_document:
+    theme:
+      version: 4
+      bootswatch: flatly
+      primary: "#ff9800"    # bright sunshine orange
+      secondary: "#ffc107"  # warm yellow
+    toc: true
+    toc_float: true
+    highlight: tango
+  pdf_document:
+    latex_engine: xelatex
+    keep_tex: false
+    df_print: kable
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    fig_caption: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+
+
+```{r lavaan-expanded-interpretation, results='asis', echo=FALSE}
+library(lavaan)
+library(psych)
+
+cat("## 🔍 Full CFA Interpretation\n\n")
+
+# -------------------------------------------------------------
+# 1 — FIT INDEX EXTRACTION
+# -------------------------------------------------------------
+fm <- fitMeasures(fit)
+
+# regular
+cfi   <- fm["cfi"];     tli   <- fm["tli"]
+rmsea <- fm["rmsea"];   rmsea_l <- fm["rmsea.ci.lower"]; rmsea_h <- fm["rmsea.ci.upper"]
+srmr  <- fm["srmr"]
+
+# scaled / robust
+cfi_s <- fm["cfi.scaled"];   tli_s <- fm["tli.scaled"]
+rmsea_s <- fm["rmsea.scaled"]
+rmsea_sl <- fm["rmsea.ci.lower.scaled"]; rmsea_sh <- fm["rmsea.ci.upper.scaled"]
+chisq_s <- fm["chisq.scaled"]; df <- fm["df"]; p_s <- fm["pvalue.scaled"]
+
+cat("###  Model Fit\n")
+cat("Model fit lives or dies on three pillars: **CFI/TLI**, **RMSEA**, and **SRMR**.\n",
+    "Because we use WLSMV, the *scaled* values carry the truth.\n\n")
+
+cat("**Scaled CFI =", round(cfi_s,3), "** — higher is better (≥0.95 ideal).\n")
+cat("**Scaled TLI =", round(tli_s,3), "** — reflects parsimony.\n")
+cat("**Scaled RMSEA =", round(rmsea_s,3), "** (", round(rmsea_sl,3), "–", 
+    round(rmsea_sh,3), ") — smaller is better (≤0.06 sweet).\n", sep="")
+cat("**SRMR =", round(srmr,3), "** — closer to 0 is harmony.\n\n")
+
+cat("**Scaled Chi-square:** χ²(", df, ") = ", round(chisq_s,3), 
+    ", p = ", signif(p_s,3), ".\n\n", sep="")
+
+# Short verdict
+cat("**Verdict:**\n")
+if (cfi_s >= .95 & rmsea_s <= .06) {
+  cat("The model stands strong: factors align cleanly and the data respects the structure.\n\n")
+} else if (cfi_s >= .90 & rmsea_s <= .08) {
+  cat("The model holds reasonably well—some turbulence exists, but the backbone is intact.\n\n")
+} else {
+  cat("The model struggles. The structure may not reflect how respondents think.\n\n")
+}
+
+# -------------------------------------------------------------
+# 2 — FACTOR-BY-FACTOR LOADING INTERPRETATION
+# -------------------------------------------------------------
+cat("###  Factor Loadings — Item Stories\n")
+loads <- inspect(fit, "std")$lambda
+loads <- round(loads, 3)
+
+for (factor in rownames(loads)) {
+  f_load <- loads[factor,]
+  f_load <- f_load[f_load != 0]
+  if (length(f_load) == 0) next
+  
+  cat("\n#### **", factor, "**\n", sep="")
+  
+  # Prepare item(label + number)
+  labeled <- paste0(names(f_load), " (", f_load, ")")
+  names(labeled) <- names(f_load)
+  
+  strong <- labeled[f_load >= .70]
+  moderate <- labeled[f_load < .70 & f_load >= .40]
+  weak <- labeled[f_load < .40]
+  
+  if (length(strong) > 0) {
+    cat("*Strong anchors:* ", paste(strong, collapse=", "), "\n")
+  }
+  if (length(moderate) > 0) {
+    cat("*Steady contributors:* ", paste(moderate, collapse=", "), "\n")
+  }
+  if (length(weak) > 0) {
+    cat("*Shaky items:* ", paste(weak, collapse=", "), "\n")
+  }
+  
+  cat("\n")
+}
+
+cat("\nA factor breathes well when most of its items load ≥0.50.  
+Items below 0.40 speak with a trembling voice—they may need rewriting or removal.\n\n")
+
+# -------------------------------------------------------------
+# 3 — RELIABILITY (ω & α)
+# -------------------------------------------------------------
+cat("###  Reliability — Internal Strength\n")
+data_num <- as.data.frame(lapply(items, function(x) as.numeric(as.character(x))))
+
+# compute for each factor
+lvs <- inspect(fit, "std")$lambda
+factors <- rownames(lvs)
+
+for (f in factors) {
+  idx <- which(lvs[f,] != 0)
+  if (length(idx) >= 3) {
+    sub <- data_num[, idx, drop=FALSE]
+    a <- psych::alpha(sub)$total$raw_alpha
+    w <- psych::omega(sub)$omega.tot
+    
+    cat("**", f, ":**  α = ", round(a,3), 
+        ", ω = ", round(w,3), "\n", sep="")
+  }
+}
+cat("\nAlpha tells you how tightly items march together.  
+Omega tells you whether the factor truly commands them.  
+ω ≥ 0.70 usually means the construct is stable.\n\n")
+
+# -------------------------------------------------------------
+# 4 — MODIFICATION INDICES (OPTIONAL INSIGHTS)
+# -------------------------------------------------------------
+cat("###  Modification Indices — Where the Strain Lives\n")
+mi <- modificationIndices(fit)
+big <- mi[mi$mi > 10, ]
+
+if (nrow(big)==0) {
+  cat("The model whispers quietly—no large residual tensions.\n\n")
+} else {
+  cat("Items that want to talk to each other outside the script:\n\n")
+  print(head(big[order(-big$mi), ], 10))
+  cat("\nHigh MI suggests shared wording, overlapping meaning, or double-loading.\n\n")
+}
+
+cat("###  Closing Interpretation\n")
+cat("The CFA is more than numbers—it's a map of how minds cluster ideas.  
+When the scaled indices sing, when loadings rise steady, and reliability holds,  
+you've carved a structure that reflects how respondents truly think.\n\n")
+```
+
+
+## Model Diagnostics and Interpretation
+
+The CFA model converged under WLSMV, but several indicators suggest that the 
+measurement model is not fully stable and may require revision.
+
+###  Empty Tetrachoric Cells
+The warning about *“two empty cells in a 2×2 table”* indicates that certain 
+binary item pairs never co-occur in specific response combinations. This 
+suggests severe imbalance in some items (e.g., nearly all 0s). This reduces 
+tetrachoric reliability and may weaken factor estimation.
+
+###  Near-Perfect Item Correlation
+The message stating that *“the correlation between i14 and i12 is nearly 1.0”* 
+implies that these two items are essentially duplicates. Such redundancy can 
+destabilize the WLSMV estimator, inflate factor covariances, and produce 
+ill-conditioned covariance matrices. Removing one of the items is recommended.
+
+###  Non–Positive-Definite Latent Covariance Matrix
+The latent covariance matrix was reported as *“not positive definite”*. This is 
+a structural warning that the factors (C1–C4) may be too highly correlated or 
+not empirically separable. It can also arise from duplicated or near-constant 
+binary items compressing the factor space. This suggests the conceptual 
+distinction between factors may not be strongly supported by the data.
+
+###  Fit Index Pattern
+The fit indices show mixed signals:
+
+- **CFI/TLI (scaled):** high (>0.98) → good  
+- **RMSEA (scaled):** ~0.041 → good  
+- **SRMR:** 0.240 → poor  
+
+The extremely high SRMR indicates that the model fails to reproduce many of the 
+item correlations. In binary CFA, such patterns often arise from strong residual 
+dependencies or misspecified factor structure.
+
+###  Factor Loadings
+Most items load significantly on their intended factors. However, a few items 
+exhibit relatively low standardized loadings (<0.30), suggesting they may not 
+measure the latent construct effectively.
+
+## Summary
+Although the model converged and several fit indices appear acceptable, the high 
+SRMR, non–positive-definite latent covariance matrix, and near-duplicate items 
+indicate that the current model is unstable. Reconsidering item inclusion, 
+removing highly collinear items, and revising the factor structure are warranted 
+before interpreting the results substantively.

@@ -1,0 +1,24 @@
+Untuk binary 0/1 dengan sampel 108, ya, hampir mustahil.
+Bukan salahmu.
+Bukan salah model.
+Bukan salah estimasi.
+
+Ini fisika statistik:
+varians terlalu kecil, faktor terlalu berkorelasi, threshold terlalu dangkal.
+
+Untuk "PD = TRUE" dengan data binary, kamu butuh salah satu dari:
+
+✔ n besar > 300
+✔ item ordinal ≥ 3 kategori
+✔ item dengan varian tidak terlalu timpang
+✔ loadings tidak terlalu homogen
+✔ atau model 2 faktor saja
+
+Tidak ada di data ini.
+
+model
+C1 =~ i9 + i12 + i20 + i31 + i50
+C2 =~ i4 + i5 + i11 + i14 + i60
+C3 =~ i17 + i22 + i23 + i28 + i37
+C4 =~ i29 + i30 + i38 + i41 + i48
+
