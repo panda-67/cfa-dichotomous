@@ -58,6 +58,8 @@ USE_MANUAL_MODEL <- TRUE   # TRUE = fallback manual grouping allowed, will alway
 # EFA_THRESHOLD = minimum absolute loading to keep an item.
 # Typical values: 0.25–0.40
 EFA_THRESHOLD <- 0.30
+
+# Number of factors to extract during EFA
 EFA_FACTOR <- 4
 
 
@@ -80,5 +82,5 @@ VERBOSE <- TRUE
 #
 # If you *really* want a custom file, override MODEL_FILE_PATH manually.
 # ------------------------------------------------------------
-MODEL_FILE_PATH <- sprintf("Models/cfa_%s_model.txt", RUN_MODE)
+MODEL_FILE_PATH <- paste0("Models/cfa_", toupper(RUN_MODE), "_model.txt")
 

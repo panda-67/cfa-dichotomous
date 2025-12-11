@@ -118,8 +118,9 @@ load_or_generate_model <- function(items,
   if (efa) {
     cat(">> Generating model via EFA (threshold =", thresh, ")...\n")
 
-    if (is.null(file)) {
+    if(!file.exists(file)) {
       if (VERBOSE) cat(">> Manual file missing → creating EFA-guided template...\n")
+
       return(
         create_efa_guided_template(
           items,
@@ -129,6 +130,7 @@ load_or_generate_model <- function(items,
         )
       )
     }
+
   } else {
     cat(">> Generating MANUAL model...\n")
   }
