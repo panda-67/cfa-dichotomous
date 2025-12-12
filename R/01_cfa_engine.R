@@ -217,9 +217,9 @@ cfa_engine <- function(file_path, pattern = "PRETEST",
   )
 
   cat(">> Running CFA...\n")
-  fit <- run_cfa(items, model, label = paste0("cfa_", pattern))
+  fit <- run_cfa(items, model, label = paste0("cfa_", to_snake(pattern)))
 
   cat(">> Done.\n")
-  fit
+  list(items = items, fit = fit)
 }
 

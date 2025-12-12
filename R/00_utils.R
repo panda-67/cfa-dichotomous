@@ -48,3 +48,18 @@ create_efa_guided_template <- function(items, n_factors = 4, thresh = .30, file)
   return(paste(lines, collapse = "\n"))
 }
 
+generate_report_pdf <- function() {
+  rmarkdown::render(
+    input = here::here("R/Rmd/report_wlsmv.Rmd"),
+    output_file   = OUTPUT_FILE,
+    output_format = "pdf_document",
+    output_dir = "Reports"
+  )
+}
+
+to_snake <- function(x) {
+  x |>
+    tolower() |>
+    gsub("[^a-z0-9]+", "_", x = _) |>
+    gsub("^_|_$", "", x = _)
+}

@@ -10,8 +10,7 @@
 # 1) INPUT DATA FILE
 # ------------------------------------------------------------
 # The Excel file containing multiple sheets (PRETEST, POSTTEST, etc.)
-DATA_FILE <- "~/Documents/Daily/Kelas Analisis/ANALISIS PRETEST POST TEST.xlsx"
-
+DATA_FILE <- "Data/ANALISIS PRETEST POST TEST.xlsx"
 
 
 # ------------------------------------------------------------
@@ -21,8 +20,7 @@ DATA_FILE <- "~/Documents/Daily/Kelas Analisis/ANALISIS PRETEST POST TEST.xlsx"
 # Accepted values:
 #   "PRETEST"
 #   "POST TEST"
-RUN_MODE <- "PRETEST"
-
+RUN_MODE <- "POST TEST"
 
 
 # ------------------------------------------------------------
@@ -32,7 +30,7 @@ RUN_MODE <- "PRETEST"
 #
 # Priority hierarchy:
 #   1) USE_MODEL_FILE == TRUE      → load model from file
-#   2) USE_EFA == TRUE             → generate model via EFA
+#   2) USE_EFA == TRUE             → generate model via EFA also generate model template if file model not exist
 #   3) otherwise                   → use the manual item grouping
 #
 # NOTE: These flags DO NOT fight each other because the CFA engine
@@ -40,14 +38,13 @@ RUN_MODE <- "PRETEST"
 # ------------------------------------------------------------
 
 # 3a. Use model file? (highest priority)
-USE_MODEL_FILE <- FALSE     # TRUE = load model from disk (recommended for finalized models)
+USE_MODEL_FILE <- TRUE     # TRUE = load model from disk (recommended for finalized models)
 
 # 3b. Use EFA-based structure?
 USE_EFA <- TRUE            # TRUE = generate EFA model unless overridden by file
 
 # 3c. Use manual model if EFA is disabled or EFA fails
 USE_MANUAL_MODEL <- TRUE   # TRUE = fallback manual grouping allowed, will always be TRUE
-
 
 
 # ------------------------------------------------------------
@@ -71,7 +68,6 @@ EFA_FACTOR <- 4
 VERBOSE <- TRUE
 
 
-
 # ------------------------------------------------------------
 # 6) MODEL FILE (Auto-Linked to RUN_MODE)
 # ------------------------------------------------------------
@@ -82,5 +78,17 @@ VERBOSE <- TRUE
 #
 # If you *really* want a custom file, override MODEL_FILE_PATH manually.
 # ------------------------------------------------------------
-MODEL_FILE_PATH <- paste0("Models/cfa_", toupper(RUN_MODE), "_model.txt")
+MODEL_FILE_PATH <- paste0("Models/cfa_", to_snake(RUN_MODE), "_model.txt")
 
+
+# -------------------------------------------------------------
+# 7) FINAL REPORT
+# -------------------------------------------------------------
+# Set TRUE to generate FINAL REPORT
+
+PDF_REPORT <- TRUE
+REPORT_TITLE <- paste("Laporan CFA", RUN_MODE)
+OUTPUT_FILE  <- sprintf("cfa_%s_wlsmv_report.pdf", to_snake(RUN_MODE))
+
+
+# ================  END OF SETUP ==============================

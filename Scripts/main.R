@@ -26,6 +26,11 @@ result <- cfa_engine(
   model_file_path = MODEL_FILE_PATH
 )
 
+if (PDF_REPORT) {
+  cat(">> Generating FINAL REPORT...\n")
+  generate_report_pdf()
+}
+
 if (VERBOSE) cat(">> Finished.\n")
 
 # End of file ===============================================
