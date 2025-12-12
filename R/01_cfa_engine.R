@@ -189,9 +189,23 @@ run_cfa <- function(items, model, label = "cfa_output") {
                  file = paste0("Reports/", label, "_std_solution.txt"))
   
   # Diagram
-  pdf(paste0("Reports/", label, "_diagram.pdf"), 10, 8)
-  semPaths(fit, what = "std", whatLabels = "std",
-           layout = "tree", edge.label.cex = .7)
+  pdf(paste0("Reports/", label, "_diagram.pdf"), 20, 12)
+  semPaths(
+    fit,
+    what = "std",
+    whatLabels = "std",
+    layout = "tree",
+    edge.label.cex = 0.8,     # label loading mengecil
+    edge.curved = TRUE,       # garis tidak menumpuk
+    curvePivot = TRUE,        # label lebih rapi
+    sizeMan = 5,              # node item sedikit lebih besar
+    sizeLat = 7,              # faktor lebih menonjol
+    nCharNodes = 0,           # jangan potong label
+    residScale = 6,           # resid lebih rapi
+    mar = c(8, 8, 8, 8),      # tambah margin
+    res = 200                 # kualitas lebih tinggi
+  )
+
   dev.off()
   
   fit

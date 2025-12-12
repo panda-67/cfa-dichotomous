@@ -18,6 +18,9 @@ load_or_install <- function(pkgs, github = NULL) {
 create_efa_guided_template <- function(items, n_factors = 4, thresh = .30, file) {
 
   cat(">> Running EFA to generate guidance...\n")
+
+  dir.create("Models", showWarnings = FALSE)
+
   items_num <- as.data.frame(lapply(items, function(x) as.numeric(as.character(x))))
 
   efa <- psych::fa(items_num, nfactors = n_factors, fm = "minres")  # safer

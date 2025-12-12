@@ -3,13 +3,16 @@
 Dokumen ini menjelaskan cara kerja *setup* global untuk sistem otomatisasi CFA (Confirmatory Factor Analysis) berbasis R. Semua konfigurasi utama dikendalikan melalui berkas **setup.R**. Anda cukup mengubah isi variabel di dalamnya tanpa pernah menyentuh kode utama.
 
 ---
+**Buka file `cfa_wlsmv.Rproj` dengan `RStudio`, pada bagian console jalankan program dengan `source("Scripts/main.R")`.**
+
+---
 
 ## 1. Berkas Input Data
 
 Sistem membaca satu berkas Excel yang berisi beberapa sheet (misalnya *PRETEST*, *POST TEST*, dll.).
 
 ```r
-DATA_FILE <- "Data/Kelas Analisis/ANALISIS PRETEST POST TEST.xlsx"
+DATA_FILE <- "Data/ANALISIS PRETEST POST TEST.xlsx"
 ```
 
 Pastikan struktur sheet sudah benar dan konsisten.
@@ -99,6 +102,8 @@ MODEL_FILE_PATH <- paste0("Models/cfa_", to_snake(RUN_MODE), "_model.txt")
 ```
 
 Anda bisa meng-override ini, tetapi tidak disarankan.
+
+Baca `README_MODEL.md`.
 
 ---
 

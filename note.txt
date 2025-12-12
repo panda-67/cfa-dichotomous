@@ -1,20 +1,25 @@
-Untuk binary 0/1 dengan sampel 108, ya, hampir mustahil.
-Bukan salahmu.
-Bukan salah model.
-Bukan salah estimasi.
+Untuk data biner (0/1) dengan n = 108, kegagalan model bukan error analisis, tetapi batas matematis:
 
-Ini fisika statistik:
-varians terlalu kecil, faktor terlalu berkorelasi, threshold terlalu dangkal.
+1. Varians rendah
 
-Untuk "PD = TRUE" dengan data binary, kamu butuh salah satu dari:
+Data biner hanya punya dua nilai → varian kecil → matriks korelasi menjadi sparse dan tidak stabil.
 
-✔ n besar > 300
-✔ item ordinal ≥ 3 kategori
-✔ item dengan varian tidak terlalu timpang
-✔ loadings tidak terlalu homogen
-✔ atau model 2 faktor saja
+2. Korelasi antar-item terlalu tinggi
 
-Tidak ada di data ini.
+Biner + sampel kecil → korelasi polikorik sering “meledak” atau menjadi singular → FA/CFA tidak konvergen.
+
+3. Dimensi terlalu banyak untuk ukuran sampel
+
+Estimator dengan “PD = TRUE” (positive-definite) butuh matriks korelasi yang stabil, sementara 108 sampel tidak cukup untuk banyak parameter.
+
+4. Homogenitas loading
+
+Item biner cenderung memuat mirip sehingga struktur faktor menjadi tidak teridentifikasi (underidentified).
+
+5. Estimasi polikorik → tidak robust di n kecil
+
+Polikorik memerlukan cukup observasi di semua sel kontingensi; dengan biner + n kecil, banyak sel kosong.
+
 
 model
 C1 =~ i9 + i12 + i20 + i31 + i50

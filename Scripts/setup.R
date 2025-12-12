@@ -20,7 +20,7 @@ DATA_FILE <- "Data/ANALISIS PRETEST POST TEST.xlsx"
 # Accepted values:
 #   "PRETEST"
 #   "POST TEST"
-RUN_MODE <- "POST TEST"
+RUN_MODE <- "PRETEST"
 
 
 # ------------------------------------------------------------
