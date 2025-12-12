@@ -8,7 +8,7 @@ EFA adalah metode statistik untuk mengidentifikasi jumlah faktor laten dan menen
 
 ## 1) EFA sebagai Pemandu Awal
 
-Jika jSE_EFA = TRUE, sistem akan menjalankan EFA dengan jumlah faktor (EFA_FACTOR) dan threshold (EFA_THRESHOLD) yang ditentukan.
+Jika USE_EFA = TRUE, sistem akan menjalankan EFA dengan jumlah faktor (EFA_FACTOR) dan threshold (EFA_THRESHOLD) yang ditentukan.
 
 EFA bertugas:
 
