@@ -2,7 +2,7 @@
 source("R/00_utils.R") 
 
 # ---- Load required packages here only -----------------------
-load_or_install(c( "lavaan", "readxl", "stringr",
+load_or_install(c("here", "lavaan", "readxl", "stringr",
   "purrr", "dplyr", "psych", "semPlot"
 ))
 
@@ -15,6 +15,8 @@ source("Scripts/setup.R")
 # ============================================================
 # main.R — Script Runner
 # ============================================================
+library(here)
+
 if (VERBOSE) cat(">> RUN MODE:", RUN_MODE, "\n")
 
 result <- cfa_engine(

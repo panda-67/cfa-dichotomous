@@ -1,4 +1,3 @@
-library(here)
 
 # Load and install library
 load_or_install <- function(pkgs, github = NULL) {
