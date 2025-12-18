@@ -5,7 +5,6 @@
 # Adjust settings here, never in the main code.
 # ============================================================
 
-
 # ------------------------------------------------------------
 # 1) INPUT DATA FILE
 # ------------------------------------------------------------
@@ -38,13 +37,13 @@ RUN_MODE <- "PRETEST"
 # ------------------------------------------------------------
 
 # 3a. Use model file? (highest priority)
-USE_MODEL_FILE <- TRUE     # TRUE = load model from disk (recommended for finalized models)
+USE_MODEL_FILE <- TRUE # TRUE = load model from disk (recommended for finalized models)
 
 # 3b. Use EFA-based structure?
-USE_EFA <- TRUE            # TRUE = generate EFA model unless overridden by file
+USE_EFA <- FALSE # TRUE = generate EFA model unless overridden by file
 
 # 3c. Use manual model if EFA is disabled or EFA fails
-USE_MANUAL_MODEL <- TRUE   # TRUE = fallback manual grouping allowed, will always be TRUE
+USE_MANUAL_MODEL <- TRUE # TRUE = fallback manual grouping allowed, will always be TRUE
 
 
 # ------------------------------------------------------------
@@ -88,7 +87,6 @@ MODEL_FILE_PATH <- paste0("Models/cfa_", to_snake(RUN_MODE), "_model.txt")
 
 PDF_REPORT <- TRUE
 REPORT_TITLE <- paste("Laporan CFA", RUN_MODE)
-OUTPUT_FILE  <- sprintf("cfa_%s_wlsmv_report.pdf", to_snake(RUN_MODE))
-
+OUTPUT_FILE <- sprintf("cfa_%s_wlsmv_report.pdf", to_snake(RUN_MODE))
 
 # ================  END OF SETUP ==============================
