@@ -37,7 +37,16 @@ generate_efa_model <- function(items, thresh = .30, nfactors = 4) {
     as.numeric(as.character(x))
   }))
 
-  efa <- psych::fa(items_num, nfactors = nfactors, fm = "minres")
+  # compute tetrachoric correlation matrix for binary items
+  tetra <- psych::tetrachoric(items_num)
+
+  # run EFA on that matrix
+  efa <- psych::fa(
+    r = tetra$rho,
+    nfactors = nfactors,
+    n.obs = nrow(items_num),
+    fm = "minres"
+  )
 
   lines <- c()
   for (f in 1:nfactors) {
@@ -77,26 +86,31 @@ generate_initial_model <- function(items, efa_override = TRUE, thresh = .30) {
 # ------------------------------------------------------------
 
 load_dataset <- function(file_path, pattern = "PRETEST") {
+  cat(">> Using dataset", file_path, "...\n")
   sheets <- excel_sheets(file_path)
   target_sheets <- sheets[str_detect(
     sheets,
     regex(pattern, ignore_case = TRUE)
   )]
 
-  df <- map_dfr(
-    target_sheets,
-    ~ {
-      read_excel(
-        file_path,
-        sheet = .x,
-        range = cell_limits(c(2, 3), c(NA, 62))
-      )
-    }
-  )
+  # df <- map_dfr( target_sheets, ~ {
+  #     read_excel(
+  #       file_path,
+  #       sheet = .x,
+  #       range = cell_limits(c(2, 3), c(NA, 62))
+  #     )
+  #   }
+  # )
 
-  if (tolower(names(df)[1]) %in% c("nama", "name")) {
-    df <- df[, -1]
-  }
+  df <- map_dfr(target_sheets, function(s) {
+    raw <- read_excel(file_path, sheet = s)
+
+    # keep only numeric item columns
+    item_cols <- names(raw)[str_detect(names(raw), "^[0-9]+$")]
+
+    raw <- raw[, item_cols]
+    raw
+  })
 
   names(df) <- paste0("i", seq_len(ncol(df)))
   df[] <- lapply(df, ordered)
@@ -127,7 +141,7 @@ load_or_generate_model <- function(
       cat(">> Loading model from file:", file, "\n")
       return(paste(readLines(file), collapse = "\n"))
     } else {
-      cat("!! Model file not found. Falling back to auto-generation...\n")
+      cat(">> Model file not found. Falling back to auto-generation...\n")
     }
   }
 
@@ -272,5 +286,5 @@ cfa_engine <- function(
   fit <- run_cfa(items, model, label = paste0("cfa_", to_snake(pattern)))
 
   cat(">> Done.\n")
-  list(items = items, fit = fit)
+  list(data = items, fit = fit)
 }

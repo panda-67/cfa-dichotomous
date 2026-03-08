@@ -9,7 +9,8 @@
 # 1) INPUT DATA FILE
 # ------------------------------------------------------------
 # The Excel file containing multiple sheets (PRETEST, POSTTEST, etc.)
-DATA_FILE <- "Data/ANALISIS PRETEST POST TEST.xlsx"
+# DATA_FILE <- "Data/ANALISIS PRETEST POST TEST.xlsx"
+DATA_FILE <- "../singkil.xlsx"
 
 
 # ------------------------------------------------------------
@@ -19,7 +20,7 @@ DATA_FILE <- "Data/ANALISIS PRETEST POST TEST.xlsx"
 # Accepted values:
 #   "PRETEST"
 #   "POST TEST"
-RUN_MODE <- "PRETEST"
+RUN_MODE <- "POST TEST"
 
 
 # ------------------------------------------------------------
@@ -29,7 +30,8 @@ RUN_MODE <- "PRETEST"
 #
 # Priority hierarchy:
 #   1) USE_MODEL_FILE == TRUE      → load model from file
-#   2) USE_EFA == TRUE             → generate model via EFA also generate model template if file model not exist
+#   2) USE_EFA == TRUE             → generate model via EFA also generate model
+#                                    template if file model not exist
 #   3) otherwise                   → use the manual item grouping
 #
 # NOTE: These flags DO NOT fight each other because the CFA engine
@@ -37,14 +39,15 @@ RUN_MODE <- "PRETEST"
 # ------------------------------------------------------------
 
 # 3a. Use model file? (highest priority)
-USE_MODEL_FILE <- TRUE # TRUE = load model from disk (recommended for finalized models)
+USE_MODEL_FILE <- TRUE # TRUE = load model from disk (recommended for
+#                                finalized models)
 
 # 3b. Use EFA-based structure?
-USE_EFA <- FALSE # TRUE = generate EFA model unless overridden by file
+USE_EFA <- TRUE # TRUE = generate EFA model unless overridden by file
 
 # 3c. Use manual model if EFA is disabled or EFA fails
-USE_MANUAL_MODEL <- TRUE # TRUE = fallback manual grouping allowed, will always be TRUE
-
+USE_MANUAL_MODEL <- TRUE # TRUE = fallback manual grouping allowed, will
+#                                 always be TRUE
 
 # ------------------------------------------------------------
 # 4) EFA OPTIONS
@@ -56,7 +59,7 @@ USE_MANUAL_MODEL <- TRUE # TRUE = fallback manual grouping allowed, will always 
 EFA_THRESHOLD <- 0.30
 
 # Number of factors to extract during EFA
-EFA_FACTOR <- 4
+EFA_FACTOR <- 2
 
 
 # ------------------------------------------------------------
