@@ -20,8 +20,9 @@ DATA_FILE <- "../singkil.xlsx"
 # Accepted values:
 #   "PRETEST"
 #   "POST TEST"
-RUN_MODE <- "POST TEST"
-
+if (!exists("RUN_MODE")) {
+  RUN_MODE <- "POST TEST"
+}
 
 # ------------------------------------------------------------
 # 3) MODEL TYPE SELECTION

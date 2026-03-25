@@ -17,11 +17,8 @@ load_or_install(c(
 # ---- Load engine (contains cfa_engine() only) --------------
 source("R/01_cfa_engine.R")
 
-# ---- Load SEM table utilities ------------------------------
-source("R/02_sem_tables.R")
-
 # ---- Load SEM Reporting ------------------------------------
-source("R/03_sem_reporting.R")
+source("R/02_sem_reporting.R")
 
 # ---- Load setup switches -----------------------------------
 source("Scripts/setup.R")
@@ -47,27 +44,6 @@ result <- cfa_engine(
 # ============================================================
 # Reliability and Validity Tables
 # ============================================================
-
-fit <- result$fit
-data <- result$data
-
-reliability <- reliability_table(fit, data)
-
-fornell <- fornell_larcker(fit)
-
-cfa_results <- cfa_table(fit)
-
-if (VERBOSE) {
-  cat("\n--- Reliability Table ---\n")
-  print(reliability)
-
-  cat("\n--- Fornell-Larcker Matrix ---\n")
-  print(fornell)
-
-  cat("\n--- CFA Results Table ---\n")
-  print(cfa_results)
-}
-
 sem_tables(result)
 
 if (PDF_REPORT) {

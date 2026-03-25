@@ -1,0 +1,175 @@
+---
+title: "`r params$title`"
+output: pdf_document
+params:
+  title: "CFA Report (Pre–Post Analysis)"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+library(lavaan)
+library(dplyr)
+library(ggplot2)
+library(semPlot)
+```
+
+# 1. Introduction
+
+This study examines the measurement structure of the construct before and after intervention using Confirmatory Factor Analysis (CFA) with ordinal indicators (WLSMV estimator).
+
+```{r}
+pre_data <- pre$data |> mutate(time = "pre")
+post_data <- post$data |> mutate(time = "post")
+
+combined <- bind_rows(pre_data, post_data)
+
+items <- c("i4", "i11", "i13", "i9", "i10", "i12", "i15")
+```
+
+
+# 2. Pre-test Measurement Model
+```{r}
+model_2f <- "
+F1 =~ i4 + i11 + i13
+F2 =~ i9 + i10 + i12 + i15
+"
+
+fit_pre <- cfa(
+  model_2f,
+  data = pre_data,
+  estimator = "WLSMV",
+  ordered = items
+)
+
+fitMeasures(fit_pre, c("cfi", "rmsea", "srmr"))
+```
+
+### Factor Loadings
+
+```{r}
+parameterEstimates(fit_pre) |>
+  filter(op == "=~") |>
+  select(Factor = lhs, Item = rhs, Loading = est, pvalue)
+```
+
+
+# 3. Post-test Measurement Model
+
+## 3.1 Two-Factor Model
+```{r}
+fit_post_2f <- cfa(
+  model_2f,
+  data = post_data,
+  estimator = "WLSMV",
+  ordered = items
+)
+
+fitMeasures(fit_post_2f, c("cfi", "rmsea", "srmr"))
+lavaan::inspect(fit_post_2f, "cor.lv")
+```
+
+## 3.2. One-Factor Model
+```{r}
+model_1f <- "
+F =~ i4 + i11 + i13 + i9 + i10 + i12 + i15
+"
+
+fit_post_1f <- cfa(
+  model_1f,
+  data = post_data,
+  estimator = "WLSMV",
+  ordered = items
+)
+
+fitMeasures(fit_post_1f, c("cfi", "rmsea", "srmr"))
+```
+
+
+# 4. Model Comparison
+```{r}
+data.frame(
+  Model = c("Pre (2F)", "Post (2F)", "Post (1F)"),
+  CFI = c(
+    fitMeasures(fit_pre, "cfi"),
+    fitMeasures(fit_post_2f, "cfi"),
+    fitMeasures(fit_post_1f, "cfi")
+  ),
+  RMSEA = c(
+    fitMeasures(fit_pre, "rmsea"),
+    fitMeasures(fit_post_2f, "rmsea"),
+    fitMeasures(fit_post_1f, "rmsea")
+  ),
+  SRMR = c(
+    fitMeasures(fit_pre, "srmr"),
+    fitMeasures(fit_post_2f, "srmr"),
+    fitMeasures(fit_post_1f, "srmr")
+  )
+)
+```
+
+
+# 5. Measurement Invariance (Exploratory)
+```{r}
+fit_config <- cfa(
+  model_2f,
+  data = combined,
+  group = "time",
+  estimator = "WLSMV",
+  ordered = items
+)
+
+fit_metric <- cfa(
+  model_2f,
+  data = combined,
+  group = "time",
+  group.equal = "loadings",
+  estimator = "WLSMV",
+  ordered = items
+)
+
+data.frame(
+  Model = c("Configural", "Metric"),
+  CFI = c(
+    fitMeasures(fit_config, "cfi"),
+    fitMeasures(fit_metric, "cfi")
+  ),
+  RMSEA = c(
+    fitMeasures(fit_config, "rmsea"),
+    fitMeasures(fit_metric, "rmsea")
+  ),
+  SRMR = c(
+    fitMeasures(fit_config, "srmr"),
+    fitMeasures(fit_metric, "srmr")
+  )
+)
+```
+
+
+# 6. Visualization
+### Pre-test Model
+
+```{r}
+semPaths(fit_pre, what = "std", layout = "tree")
+```
+
+### Post-test (Best Model)
+```{r}
+semPaths(fit_post_1f, what = "std", layout = "tree")
+```
+
+
+# 7. Interpretation
+- The pre-test model supports a two-factor structure.
+- The post-test two-factor model shows discriminant validity issues.
+- The one-factor model provides a more stable representation.
+
+Conclusion:
+The intervention appears to have shifted the construct from multidimensional to unidimensional.
+
+
+# 8. Conclusion
+
+The findings suggest a structural transformation of the latent construct following intervention, indicating conceptual consolidation rather than mere score improvement.
+
+---

@@ -1,0 +1,126 @@
+---
+title: "Descriptive Statistics Report"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+library(dplyr)
+library(psych)
+library(ggplot2)
+library(tidyr)
+library(reshape2)
+library(ggpubr)
+```
+
+# 1. Introduction
+
+This report presents descriptive statistics of the dataset, including central tendency, variability, distribution, and reliability of the measured items.
+
+```{r}
+pre_data <- pre$data |> mutate(time = "pre")
+post_data <- post$data |> mutate(time = "post")
+
+combined_ <- bind_rows(pre_data, post_data)
+
+items <- names(pre$data)
+combined <- combined_ |> mutate(across(all_of(items), ~ as.numeric(.)))
+```
+
+# 2. Descriptive Statistics
+## 2.1 Overall Descriptives
+```{r}
+overall_prop <- combined |>
+  summarise(across(all_of(items), ~ mean(.x, na.rm = TRUE))) |>
+  pivot_longer(everything(), names_to = "item", values_to = "proportion")
+
+overall_prop |> print(n = Inf)
+```
+
+## 2.2 Descriptive by Group (Pre vs Post)
+```{r}
+prop_by_group <- combined |>
+  group_by(time) |>
+  summarise(across(all_of(items), ~ mean(.x, na.rm = TRUE))) |>
+  pivot_longer(-time, names_to = "item", values_to = "proportion")
+
+prop_by_group |> print(n = Inf)
+```
+
+# 3. Visualization
+## 3.1 Proportion per Item (Pre vs Post)
+
+```{r, fig.height=8}
+combined_long <- combined_ |>
+  pivot_longer(cols = all_of(items), names_to = "item", values_to = "value")
+
+ggplot(combined_long, aes(x = value, fill = time)) +
+  geom_bar(position = "dodge") +
+  facet_wrap(~item, scales = "free") +
+  labs(title = "Distribution per Item (Pre vs Post)") +
+  theme_pubclean()
+```
+
+## 3.2 Boxplot (Pre vs Post)
+
+```{r, fig.height=8}
+diff_plot <- prop_by_group |>
+  pivot_wider(names_from = time, values_from = proportion) |>
+  mutate(diff = post - pre)
+
+ggplot(diff_plot, aes(x = item, y = diff)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Change in Proportion (Post - Pre)",
+    y = "Difference",
+    x = "Item"
+  ) +
+  theme_pubclean()
+```
+
+# 4. Reliability Analysis
+## 4.1 Cronbach’s Alpha (Pre-test)
+```{r}
+pre_poly <- psych::polychoric(pre_data[, items])
+psych::alpha(pre_poly$rho)
+```
+
+## 4.2 Cronbach’s Alpha (Post-test)
+```{r}
+post_poly <- psych::polychoric(post_data[, items])
+psych::alpha(post_poly$rho)
+```
+
+# 5. Correlation Matrix
+```{r}
+poly <- psych::polychoric(combined[, items])
+cor_matrix <- poly$rho
+round(cor_matrix, 2)
+```
+
+## Heatmap
+```{r}
+melted <- reshape2::melt(poly$rho)
+
+ggplot(melted, aes(Var1, Var2, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient2() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Correlation Heatmap") +
+  theme_pubclean()
+```
+
+# 7. Interpretation
+- Mean values indicate general response tendencies across items.
+- Standard deviation reflects variability among participants.
+- Skewness and kurtosis suggest whether distributions deviate from normality.
+- Reliability (Cronbach’s alpha) indicates internal consistency.
+- Correlation patterns help identify relationships among items.
+
+# 8. Conclusion
+
+The descriptive analysis provides a foundational understanding of the dataset, supporting further inferential analyses such as CFA and SEM.
+
+---
